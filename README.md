@@ -24,13 +24,13 @@ The number of tickers increased from 2014 to 2016. The trading dates are listed 
         RowFirst = Range("A1:A" & LastRow).Find(What:=ticker, LookAt:=xlWhole, SearchDirection:=xlNext, MatchCase:=False).Row
         RowLast = Range("A1:A" & LastRow).Find(What:=ticker, LookAt:=xlWhole, SearchDirection:=xlPrevious, MatchCase:=False).Row
 
-Assuming that trading started on the first time the ticker occurred in Column A, then determining the value of each ticker at on the year's first (year_open) and last trading day (year_close) was done using this code:
+Assuming that trading started on the first time the ticker occurred in Column A, then determining the value of each ticker on the year's first (year_open) and last trading day (year_close) was done using this code:
 
         ' Determine stock value on first day opening and last day closing
         year_open = Cells(RowFirst, 3).Value
         year_close = Cells(RowLast, 6).Value
 
-Yearly change (yearly_change) per ticker was calculated based on the opening value on the first day and the closing value on the last day. To ease in differentiating negative and positive changes, each cell of yearly_change values was colour-filled as follows: negative changes were red (3) and positive changes were green (4). Cells with yearly_change = 0 were kept uncoloured.
+Yearly change (yearly_change, Column K) per ticker was calculated based on the opening value on the first day and the closing value on the last day. To ease in differentiating negative and positive changes, each cell of yearly_change values was colour-filled as follows: negative changes were red (3) and positive changes were green (4). Cells with yearly_change = 0 were kept uncoloured.
 
           yearly_change = year_close - year_open
           
@@ -40,18 +40,62 @@ Yearly change (yearly_change) per ticker was calculated based on the opening val
                     Cells(position, 11).Interior.ColorIndex = 4
             End If
 
-          percent_change = (yearly_change / year_open) * 100
+Obtaining the percent change (percent_change, Column L) between each ticker's opening and closing values was straightforward. But because there were tickers whose opening values were zero at the start of the year and dividing by zero is disallowed, a conditional was added to print NA for tickers whose year_open = 0. 
 
-The VBA scripts were provided as a .docx file
+          If year_open > 0 Then
+            percent = yearly_change / year_open
+            Cells(position, 12).Value = percent
+            Cells(position, 12).NumberFormat = "0.00%"
+        ElseIf year_open <= 0 Then
+            Cells(position, 12).Value = "NA"
+        End If
+
+### Greatest changes
+To find the tickers with the greatest changes from Column L for percent change and from Column M for total stock volume, VBA's Application.WorksheetFunction.Max and Application.WorksheetFunction.Min were used. These are equivalent to the Max and Min functions in MS Excel. The following variables were determined:
+
+        gt_in = greatest percent increase
+        gt_dc = greatest percent decrease
+        gt_vol = greatest total stock volume
+
+The Max and Min functions were determined using the following VBA scripts:
+
+        gt_in = Application.WorksheetFunction.Max(Columns("L"))
+        gt_dc = Application.WorksheetFunction.Min(Columns("L"))
+        gt_vol = Application.WorksheetFunction.Max(Columns("M"))
+
+To determine the tickers corresponding to these greatest changes, a new loop was conducted; this time, using the unique tickers in Column J. Because this is a new list, it was important to determine the last row with content in this column.
+
+        ' Find the last row
+        LastRow = Cells(Rows.Count, 10).End(xlUp).Row
+
+        ' Loop through the column to find the corresponding ticker
+        For j = 1 To LastRow
+
+        ' Find the corresponding ticker
+        If Cells(j, 12).Value = gt_in Then
+           Cells(2, 17).Value = Cells(j, 10).Value
+        End If
+    
+        If Cells(j, 12).Value = gt_dc Then
+           Cells(3, 17).Value = Cells(j, 10).Value
+        End If
+    
+        If Cells(j, 13).Value = gt_vol Then
+           Cells(4, 17).Value = Cells(j, 10).Value
+        End If
+    
+    Next j
+
+The complete VBA scripts were provided as a .docx file
 
 ## Results
-In the 2014 dataset, there were 2835 tickers. A majority of these tickers (n = 1714) performed well by having a higher value at the close of the last trading day than the value at the start of the first trading day of the year. Two of the tickers did not show a change in value while 1118 tickers had negative changes between the year's open and the year's close. One ticker, PLNT, did not appear to have been traded in 2014. It started getting traded on August 6, 2015.
+In the 2014 dataset, there were 2835 tickers. A majority of these tickers (n = 1714) performed well by having a higher value at the close of the last trading day than the value at the start of the first trading day of the year. Two of the tickers did not show a change in value while 1118 tickers had negative changes between the year's open and the year's close. One ticker, PLNT, did not appear to have been traded in 2014 and it's opening value was set at zero. It received a non-zero valuation and started getting traded on August 6, 2015.
 
 ![2014](https://github.com/rochiecuevas/VBA-Stocks/blob/master/VBA_moderate-difficult_2014.png)
 Figure 1. Screenshot of the 2014 results
 
 
-In 2015, 3004 tickers were included in the dataset. Results showed that 1102 of these tickers had higher values at year's end than when they were traded at the start of the year. Eight of the tickers started and ended the year with the same value. On the other hand, 63% of the tickers(n = 1894) had lower values at year's close than when trading started at the year's beginning.
+In 2015, 3004 tickers were included in the dataset. Results showed that 1102 of these tickers had higher values at year's end than when they were traded at the start of the year. Eight of the tickers started and ended the year with the same value. On the other hand, 63% of the tickers (n = 1894) had lower values at year's close than when trading started at the year's beginning.
 
 ![2015](https://github.com/rochiecuevas/VBA-Stocks/blob/master/VBA_moderate-difficult_2015.png)
 Figure 2. Screenshot of the 2015 results
