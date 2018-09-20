@@ -5,7 +5,7 @@ The multi-year stock data contains daily information on stock volume, opening an
 For this dataset, VBA scripts were written and executed to determine, for each year, the following: total volume per stock, yearly change, and percent change. The stock with the highest total stock volume, the stock with the greatest percent decrease, and the stock with the greatest percent increase were also indicated.
 
 ### Total stock volume per ticker
-To get the total stock volume (vol) per ticker, subtotals were calculated using the SumIf function in VBA. In this case, Column A contains the tickers and Column G contains the stock volume for each trading day of each ticker. A new list, containing each unique ticker and its volume subtotal, was put in Columns J–M.
+To get the total stock volume (vol, Column M) per ticker, subtotals were calculated using the SumIf function in VBA. In this case, Column A contains the tickers and Column G contains the stock volume for each trading day of each ticker. A new list, containing each unique ticker and its volume subtotal, was put in Columns J–M.
 
         For i = 2 To LastRow
         ticker = Cells(i, 1).Value
@@ -18,7 +18,7 @@ To get the total stock volume (vol) per ticker, subtotals were calculated using 
         End If    
 
 ### Comparing stock values between the start and the end of the year
-The number of tickers increased from 2014 to 2016. The trading dates are listed in Column B. Ideally, each year started on January 1 (<year>0101) and ended on December 30 (<year>1230). However, the trade of many tickers did not start and end on these days; this situation has led to varying ranges per ticker. Hence, it was important to find the first and last occurrences of each ticker in Column A to determine the range of rows per ticker.
+The number of tickers increased from 2014 to 2016. The trading dates are listed in Column B. Ideally, each year started on January 1 (201x0101) and ended on December 30 (201x1230). However, the trade of many tickers did not start and end on these days; this situation has led to varying ranges per ticker. Hence, it was important to find the first and last occurrences of each ticker in Column A to determine the range of rows per ticker.
           
         ' Determine the row numbers of first and last entries for the year
         RowFirst = Range("A1:A" & LastRow).Find(What:=ticker, LookAt:=xlWhole, SearchDirection:=xlNext, MatchCase:=False).Row
@@ -30,7 +30,7 @@ Assuming that trading started on the first time the ticker occurred in Column A,
         year_open = Cells(RowFirst, 3).Value
         year_close = Cells(RowLast, 6).Value
 
-Yearly change (yearly_change, Column K) per ticker was calculated based on the opening value on the first day and the closing value on the last day. To ease in differentiating negative and positive changes, each cell of yearly_change values was colour-filled as follows: negative changes were red (3) and positive changes were green (4). Cells with yearly_change = 0 were kept uncoloured.
+Yearly change (yearly_change, Column K) per ticker was calculated based on the opening value (Column C) on the first day and the closing value (Column F) on the last day. To ease in differentiating negative and positive changes, each cell of yearly_change values was colour-filled as follows: negative changes were red (3) and positive changes were green (4). Cells with yearly_change = 0 were kept uncoloured.
 
           yearly_change = year_close - year_open
           
