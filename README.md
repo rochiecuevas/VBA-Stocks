@@ -4,6 +4,7 @@ The multi-year stock data contains daily information on stock volume, opening an
 ## Method
 For this dataset, VBA scripts were written and executed to determine, for each year, the following: total volume per stock, yearly change, and percent change. The stock with the highest total stock volume, the stock with the greatest percent decrease, and the stock with the greatest percent increase were also indicated.
 
+### Total stock volume per ticker
 To get the total stock volume (vol) per ticker, subtotals were calculated using the SumIf function in VBA. In this case, Column A contains the tickers and Column G contains the stock volume for each trading day of each ticker. A new list, containing each unique ticker and its volume subtotal, was put in Columns J–M.
 
         For i = 2 To LastRow
@@ -16,22 +17,30 @@ To get the total stock volume (vol) per ticker, subtotals were calculated using 
             Cells(position, 13).Value = vol
         End If    
 
+### Comparing stock values between the start and the end of the year
 The number of tickers increased from 2014 to 2016. The trading dates are listed in Column B. Ideally, each year started on January 1 (<year>0101) and ended on December 30 (<year>1230). However, the trade of many tickers did not start and end on these days; this situation has led to varying ranges per ticker. Hence, it was important to find the first and last occurrences of each ticker in Column A to determine the range of rows per ticker.
           
         ' Determine the row numbers of first and last entries for the year
         RowFirst = Range("A1:A" & LastRow).Find(What:=ticker, LookAt:=xlWhole, SearchDirection:=xlNext, MatchCase:=False).Row
         RowLast = Range("A1:A" & LastRow).Find(What:=ticker, LookAt:=xlWhole, SearchDirection:=xlPrevious, MatchCase:=False).Row
 
-Assuming that trading started on the first time the ticker occurred in Column A, then determining the value of each ticker at on the year's first (year_open) and last trading day (year_close) can be done using this code:
+Assuming that trading started on the first time the ticker occurred in Column A, then determining the value of each ticker at on the year's first (year_open) and last trading day (year_close) was done using this code:
 
         ' Determine stock value on first day opening and last day closing
         year_open = Cells(RowFirst, 3).Value
         year_close = Cells(RowLast, 6).Value
 
-The following equations were used to calculate some of the variables:
+Yearly change (yearly_change) per ticker was calculated based on the opening value on the first day and the closing value on the last day. To ease in differentiating negative and positive changes, each cell of yearly_change values was colour-filled as follows: negative changes were red (3) and positive changes were green (4). Cells with yearly_change = 0 were kept uncoloured.
 
-          yearly change = year_close - year_open
-          percent change = (yearly_change / year_open) * 100
+          yearly_change = year_close - year_open
+          
+          If yearly_change < 0 Then
+                    Cells(position, 11).Interior.ColorIndex = 3
+            ElseIf yearly_change > 0 Then
+                    Cells(position, 11).Interior.ColorIndex = 4
+            End If
+
+          percent_change = (yearly_change / year_open) * 100
 
 The VBA scripts were provided as a .docx file
 
