@@ -9,6 +9,14 @@ The following equations were used to calculate some of the variables:
           yearly change = value of stock at year close - value of stock at year open
           percent change = (yearly change / value of stock at year open) * 100
 
-Screenshots of the results per year (.png) and the VBA scripts used (.docx) for the easy- (basic), and the moderate- and hard- (moderate-difficult) homework are included.
-
 ## Results
+
+
+![2014](https://github.com/rochiecuevas/VBA-Stocks/blob/master/VBA_moderate-difficult_2014.png)
+Figure 1. Screenshot of the 2014 results
+
+![2015](https://github.com/rochiecuevas/VBA-Stocks/blob/master/VBA_moderate-difficult_2015.png)
+Figure 2. Screenshot of the 2015 results
+
+![2016](https://github.com/rochiecuevas/VBA-Stocks/blob/master/VBA_moderate-difficult_2016.png)
+Figure 3. Screenshot of the 2016 results
